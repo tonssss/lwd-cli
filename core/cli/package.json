@@ -1,0 +1,40 @@
+{
+  "name": "@lwd-cli/core",
+  "version": "0.0.6",
+  "description": "> TODO: description",
+  "author": "laiwendong <294343714@qq.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "",
+  "bin": {
+    "lwd-cli": "bin/index.js"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "gitHead": "4accb0b1abafc5866f1d994a06184ea05bef4b9f",
+  "dependencies": {
+    "@lwd-cli/get-npm-info": "file:../../utils/get-npm-info",
+    "@lwd-cli/log": "file:../../utils/log",
+    "@lwd-cli/init": "file:../../commands/init",
+    "@lwd-cli/exec": "file:../exec",
+    "colors": "^1.4.0",
+    "commander": "^9.1.0",
+    "dotenv": "^16.0.0",
+    "import-local": "^3.1.0",
+    "path-exists": "^4.0.0",
+    "root-check": "^1.0.0",
+    "semver": "^7.3.5",
+    "user-home": "^2.0.0"
+  }
+}
