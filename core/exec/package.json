@@ -24,8 +24,9 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@lwd-cli/log": "file:../../utils/log",
-    "@lwd-cli/package": "file:../../models/package",
-    "@lwd-cli/utils": "file:../../utils/utils"
-  }
+    "@lwd-cli/log": "^1.0.0",
+    "@lwd-cli/package": "^1.0.0",
+    "@lwd-cli/utils": "^1.0.0"
+  },
+  "gitHead": "22726a2d24cbb94ca7901ecbf330ea520b64ca06"
 }

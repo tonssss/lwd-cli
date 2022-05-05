@@ -24,12 +24,13 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@lwd-cli/format-path": "file:../../utils/format-path",
-    "@lwd-cli/get-npm-info": "file:../../utils/get-npm-info",
-    "@lwd-cli/utils": "file:../../utils/utils",
+    "@lwd-cli/format-path": "^1.0.0",
+    "@lwd-cli/get-npm-info": "^1.0.0",
+    "@lwd-cli/utils": "^1.0.0",
     "fs-extra": "^9.0.1",
     "npminstall": "^4.10.0",
     "path-exists": "^4.0.0",
     "pkg-dir": "^5.0.0"
-  }
+  },
+  "gitHead": "22726a2d24cbb94ca7901ecbf330ea520b64ca06"
 }

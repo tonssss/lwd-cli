@@ -25,5 +25,6 @@
   },
   "dependencies": {
     "cli-spinner": "^0.2.10"
-  }
+  },
+  "gitHead": "22726a2d24cbb94ca7901ecbf330ea520b64ca06"
 }

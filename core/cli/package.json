@@ -22,12 +22,12 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
-  "gitHead": "4accb0b1abafc5866f1d994a06184ea05bef4b9f",
+  "gitHead": "22726a2d24cbb94ca7901ecbf330ea520b64ca06",
   "dependencies": {
-    "@lwd-cli/exec": "file:../exec",
-    "@lwd-cli/get-npm-info": "file:../../utils/get-npm-info",
-    "@lwd-cli/init": "file:../../commands/init",
-    "@lwd-cli/log": "file:../../utils/log",
+    "@lwd-cli/exec": "^1.0.0",
+    "@lwd-cli/get-npm-info": "^1.0.0",
+    "@lwd-cli/init": "^1.0.0",
+    "@lwd-cli/log": "^1.0.0",
     "colors": "^1.4.0",
     "commander": "^9.1.0",
     "dotenv": "^16.0.0",
