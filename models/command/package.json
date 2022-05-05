@@ -1,6 +1,6 @@
 {
   "name": "@lwd-cli/command",
-  "version": "0.0.6",
+  "version": "1.0.0",
   "description": "> TODO: description",
   "author": "tons <294343714@qq.com>",
   "homepage": "",
@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@lwd-cli/log": "file:../../utils/log",
-    "semver": "^7.3.5",
-    "colors": "^1.4.0"
+    "colors": "^1.4.0",
+    "semver": "^7.3.5"
   }
 }
