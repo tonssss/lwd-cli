@@ -1,6 +1,6 @@
 {
   "name": "@lwd-cli/package",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "> TODO: description",
   "author": "davin124 <294343714@qq.com>",
   "homepage": "",
@@ -24,9 +24,9 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@lwd-cli/format-path": "^1.0.0",
-    "@lwd-cli/get-npm-info": "^1.0.0",
-    "@lwd-cli/utils": "^1.0.0",
+    "@lwd-cli/format-path": "^1.0.1",
+    "@lwd-cli/get-npm-info": "^1.0.1",
+    "@lwd-cli/utils": "^1.0.1",
     "fs-extra": "^9.0.1",
     "npminstall": "^4.10.0",
     "path-exists": "^4.0.0",

@@ -1,6 +1,6 @@
 {
   "name": "@lwd-cli/command",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "> TODO: description",
   "author": "tons <294343714@qq.com>",
   "homepage": "",
@@ -24,7 +24,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@lwd-cli/log": "^1.0.0",
+    "@lwd-cli/log": "^1.0.1",
     "colors": "^1.4.0",
     "semver": "^7.3.5"
   },
