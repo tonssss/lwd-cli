@@ -40,6 +40,10 @@ function registerCommand () {
     .option('-f, --force', '是否强制初始化项目')
     .action(exec)
 
+  program
+    .command('publish')
+    .action(exec)
+
   // 开启debug模式
   program.on('option:debug', function () {
     if (program.opts().debug) {

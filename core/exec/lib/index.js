@@ -7,6 +7,7 @@ const { exec: spawn } = require('@lwd-cli/utils');
 
 const SETTINGS = {
   init: '@lwd-cli/init',
+  publish: '@lwd-cli/publish'
 }
 
 const CACHE_DIR = 'dependencies'
