@@ -5,6 +5,7 @@ const fs = require('fs')
 const fse = require('fs-extra')
 const Command = require('@lwd-cli/command')
 const log = require('@lwd-cli/log')
+const Git = require('@lwd-cli/git')
 
 class PublishCommand extends Command {
     init () {
@@ -18,6 +19,8 @@ class PublishCommand extends Command {
             // 1.初始化检查
             this.perpare()
             // 2.Git flow 自动化
+            const git = new Git()
+            git.init()
             // 3.云构建和云发布
             const endTime = new Date().getTime()
             log.info('本次发布耗时：', Math.floor((endTime - startTime) / 1000) + '秒')

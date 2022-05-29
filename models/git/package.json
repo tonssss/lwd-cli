@@ -1,8 +1,8 @@
 {
-  "name": "@lwd-cli/publish",
+  "name": "@lwd-cli/git",
   "version": "1.0.1",
   "description": "> TODO: description",
-  "author": "tons <294343714@qq.com>",
+  "author": "tonssss <294343714@qq.com>",
   "homepage": "https://github.com/tonssss/lwd-cli#readme",
   "license": "ISC",
   "main": "lib/index.js",
@@ -22,11 +22,6 @@
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
-  },
-  "dependencies": {
-    "@lwd-cli/command": "^1.0.1",
-    "@lwd-cli/log": "^1.0.1",
-    "@lwd-cli/git": "file:../../models/git"
   },
   "bugs": {
     "url": "https://github.com/tonssss/lwd-cli/issues"
