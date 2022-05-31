@@ -10,7 +10,7 @@ const Git = require('@lwd-cli/git')
 class PublishCommand extends Command {
     init () {
         // 处理参数
-        log.verbose('init', this._argv)
+        log.verbose('publish', this._argv)
     }
 
     async exec () {
@@ -19,8 +19,8 @@ class PublishCommand extends Command {
             // 1.初始化检查
             this.perpare()
             // 2.Git flow 自动化
-            const git = new Git()
-            git.init()
+            const git = new Git(this.projectInfo)
+            git.checkHomePath()
             // 3.云构建和云发布
             const endTime = new Date().getTime()
             log.info('本次发布耗时：', Math.floor((endTime - startTime) / 1000) + '秒')

@@ -25,5 +25,11 @@
   },
   "bugs": {
     "url": "https://github.com/tonssss/lwd-cli/issues"
+  },
+  "dependencies": {
+    "@lwd-cli/log": "^1.0.1",
+    "fs-extra": "^10.1.0",
+    "simple-git": "^3.7.1",
+    "user-home": "^3.0.0"
   }
 }
