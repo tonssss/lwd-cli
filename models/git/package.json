@@ -28,7 +28,9 @@
   },
   "dependencies": {
     "@lwd-cli/log": "^1.0.1",
+    "@lwd-cli/utils": "file:../../utils/utils",
     "fs-extra": "^10.1.0",
+    "inquirer": "^8.2.4",
     "simple-git": "^3.7.1",
     "user-home": "^3.0.0"
   }
