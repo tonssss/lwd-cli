@@ -29,9 +29,11 @@
   "dependencies": {
     "@lwd-cli/log": "^1.0.1",
     "@lwd-cli/utils": "file:../../utils/utils",
+    "axios": "^0.27.2",
     "fs-extra": "^10.1.0",
     "inquirer": "^8.2.4",
     "simple-git": "^3.7.1",
+    "terminal-link": "^2.1.1",
     "user-home": "^3.0.0"
   }
 }
