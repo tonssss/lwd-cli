@@ -8,7 +8,7 @@ const userHome = require('user-home')
 const inquirer = require('inquirer')
 const terminalLink = require('terminal-link')
 const log = require('@lwd-cli/log')
-const { readFile, writeFile } = require('@lwd-cli/utils');
+const { readFile, writeFile, spinnerStart } = require('@lwd-cli/utils');
 const Github = require('./Github');
 const Gitee = require('./Gitee');
 
@@ -18,6 +18,7 @@ const GIT_SERVER_FILE = '.git_server'
 const GIT_TOKEN_FILE = '.git_token'
 const GIT_OWN_FILE = '.git_own'
 const GIT_LOGIN_FILE = '.git_login'
+const GIT_IGNORE_FILE = '.gitignore'
 
 const GITHUB = 'github'
 const GITEE = 'gitee'
@@ -61,6 +62,7 @@ class Git {
         this.orgs = null // 用户所属组织列表
         this.owner = null // 远程仓库类型
         this.login = null // 远程仓库登录名
+        this.repo = null // 远程仓库信息
         this.refreshServer = refreshServer // 是否强制刷新远程仓库
         this.refreshToken = refreshToken // 是否强化刷新远程仓库token
         this.refreshOwner = refreshOwner // 是否强化刷新远程仓库类型
@@ -77,6 +79,106 @@ class Git {
         await this.getUserAndOrgs()
         // 确认远程仓库类型
         await this.checkGitOwner()
+        // 检查并创建远程仓库
+        await this.checkRepo()
+        // 检查并创建.gitignore文件
+        this.checkGitIgnore()
+        // 完成本地仓库初始化
+        await this.init()
+    }
+
+    async init() {
+        if (await this.getRemote()) {
+            return;
+        }
+        await this.initAndAddRemote()
+        await this.initCommit()
+    }
+
+    async initCommit() {
+        await this.checkConflicted();
+        await this.checkNotCommitted();
+        if (await this.checkRemoteMaster()) {
+            await this.pullRemoteRepo('master', {
+                '--allow-unrelated-histories': null,
+            });
+        } else {
+            await this.pushRemoteRepo('master');
+        }
+    }
+
+    async pullRemoteRepo(branchName, options) {
+        log.info(`同步远程${branchName}分支代码`);
+        await this.git.pull('origin', branchName, options)
+            .catch(err => {
+                log.error(err.message);
+            });
+    }
+
+    async pushRemoteRepo(branchName) {
+        // log.info(`推送代码至${branchName}分支`);
+        await this.git.push('origin', branchName);
+        // log.success('推送代码成功');
+    }
+
+    async checkRemoteMaster() {
+        return (await this.git.listRemote(['--refs'])).indexOf('refs/heads/master') >= 0;
+    }
+
+    async checkNotCommitted() {
+        const status = await this.git.status();
+        if (status.not_added.length > 0 ||
+            status.created.length > 0 ||
+            status.deleted.length > 0 ||
+            status.modified.length > 0 ||
+            status.renamed.length > 0
+        ) {
+            log.verbose('status', status);
+            await this.git.add(status.not_added);
+            await this.git.add(status.created);
+            await this.git.add(status.deleted);
+            await this.git.add(status.modified);
+            await this.git.add(status.renamed);
+            let message;
+            while (!message) {
+                message = (await inquirer.prompt({
+                    type: 'text',
+                    name: 'message',
+                    message: '请输入commit信息：',
+                })).message;
+            }
+            await this.git.commit(message);
+            log.success('本次commit提交成功');
+        }
+    }
+
+    async checkConflicted() {
+        log.info('代码冲突检查');
+        const status = await this.git.status();
+        if (status.conflicted.length > 0) {
+            throw new Error('当前代码存在冲突，请手动处理合并后再试！');
+        }
+        log.success('代码冲突检查通过');
+    }
+
+    getRemote() {
+        const gitPath = path.resolve(this.dir, GIT_ROOT_DIR)
+        this.remote = this.gitServer.getRemote(this.login, this.name)
+        if (fs.existsSync(gitPath)) {
+            log.success('git已完成初始化')
+            return true;
+        }
+    }
+
+    async initAndAddRemote() {
+        log.info('执行git初始化');
+        await this.git.init(this.dir);
+        log.info('添加git remote');
+        const remotes = await this.git.getRemotes();
+        log.verbose('git remotes', remotes);
+        if (!remotes.find(item => item.name === 'origin')) {
+            await this.git.addRemote('origin', this.remote);
+        }
     }
 
     checkHomePath() {
@@ -189,6 +291,64 @@ class Git {
         this.login = login
     }
 
+    async checkRepo() {
+        let repo = await this.gitServer.getRepo(this.login, this.name)
+        log.verbose('repo', repo)
+        if (!repo) {
+            let spinner = spinnerStart('开始创建远程仓库...')
+            try {
+                if (this.owner === REPO_OWNER_USER) {
+                    repo = this.gitServer.createRepo(this.name)
+                    console.log(repo)
+                } else {
+                    this.gitServer.createOrgRepo(this.name, this.login)
+                }
+            } catch (e) {
+
+            } finally {
+                spinner.stop()
+            }
+            if (repo) {
+                log.success('远程仓库创建成功')
+            } else {
+                throw new Error('远程仓库创建失败')
+            }
+        } else {
+            log.success('远程仓库信息获取成功')
+        }
+        this.repo = repo
+    }
+
+    checkGitIgnore() {
+        const gitIgnore = path.resolve(this.dir, GIT_IGNORE_FILE);
+        if (!fs.existsSync(gitIgnore)) {
+            writeFile(gitIgnore, `.DS_Store
+    node_modules
+    /dist
+    
+    
+    # local env files
+    .env.local
+    .env.*.local
+    
+    # Log files
+    npm-debug.log*
+    yarn-debug.log*
+    yarn-error.log*
+    pnpm-debug.log*
+    
+    # Editor directories and files
+    .idea
+    .vscode
+    *.suo
+    *.ntvs*
+    *.njsproj
+    *.sln
+    *.sw?`);
+            log.success(`自动写入${GIT_IGNORE_FILE}文件成功`);
+        }
+    }
+
     createGitServer(gitServer) {
         const _gitServer = gitServer.trim()
         if (_gitServer === GITHUB) {
@@ -204,10 +364,6 @@ class Git {
         const filePath = path.resolve(rootDir, file)
         fse.ensureDirSync(rootDir)
         return filePath
-    }
-
-    init() {
-        console.log('init')
     }
 }
 
