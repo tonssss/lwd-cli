@@ -1,6 +1,6 @@
 {
   "name": "@lwd-cli/core",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "> TODO: description",
   "author": "laiwendong <294343714@qq.com>",
   "homepage": "",
@@ -24,10 +24,10 @@
   },
   "gitHead": "22726a2d24cbb94ca7901ecbf330ea520b64ca06",
   "dependencies": {
-    "@lwd-cli/exec": "^1.0.1",
-    "@lwd-cli/get-npm-info": "^1.0.1",
-    "@lwd-cli/init": "^1.0.1",
-    "@lwd-cli/log": "^1.0.1",
+    "@lwd-cli/exec": "^1.0.2",
+    "@lwd-cli/get-npm-info": "^1.0.2",
+    "@lwd-cli/init": "^1.0.2",
+    "@lwd-cli/log": "^1.0.2",
     "colors": "^1.4.0",
     "commander": "^9.1.0",
     "dotenv": "^16.0.0",

@@ -1,6 +1,6 @@
 {
   "name": "@lwd-cli/publish",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "> TODO: description",
   "author": "tons <294343714@qq.com>",
   "homepage": "https://github.com/tonssss/lwd-cli#readme",
@@ -24,9 +24,9 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@lwd-cli/command": "^1.0.1",
+    "@lwd-cli/command": "^1.0.2",
     "@lwd-cli/git": "file:../../models/git",
-    "@lwd-cli/log": "^1.0.1"
+    "@lwd-cli/log": "^1.0.2"
   },
   "bugs": {
     "url": "https://github.com/tonssss/lwd-cli/issues"
