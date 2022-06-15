@@ -1,6 +1,6 @@
 {
   "name": "@lwd-cli/git",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "> TODO: description",
   "author": "tonssss <294343714@qq.com>",
   "homepage": "https://github.com/tonssss/lwd-cli#readme",
@@ -27,8 +27,8 @@
     "url": "https://github.com/tonssss/lwd-cli/issues"
   },
   "dependencies": {
-    "@lwd-cli/log": "^1.0.2",
-    "@lwd-cli/utils": "^1.0.2",
+    "@lwd-cli/log": "^1.0.3",
+    "@lwd-cli/utils": "^1.0.3",
     "axios": "^0.27.2",
     "fs-extra": "^10.1.0",
     "inquirer": "^8.2.4",

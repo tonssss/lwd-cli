@@ -1,6 +1,6 @@
 {
   "name": "@lwd-cli/exec",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "> TODO: description",
   "author": "davin124 <294343714@qq.com>",
   "homepage": "",
@@ -24,9 +24,9 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@lwd-cli/log": "^1.0.2",
-    "@lwd-cli/package": "^1.0.2",
-    "@lwd-cli/utils": "^1.0.2"
+    "@lwd-cli/log": "^1.0.3",
+    "@lwd-cli/package": "^1.0.3",
+    "@lwd-cli/utils": "^1.0.3"
   },
   "gitHead": "c10d89ab9e652796d05cdd096b459cada5ef8cd6"
 }
