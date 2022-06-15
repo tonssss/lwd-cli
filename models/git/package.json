@@ -28,12 +28,13 @@
   },
   "dependencies": {
     "@lwd-cli/log": "^1.0.2",
-    "@lwd-cli/utils": "file:../../utils/utils",
+    "@lwd-cli/utils": "^1.0.2",
     "axios": "^0.27.2",
     "fs-extra": "^10.1.0",
     "inquirer": "^8.2.4",
     "simple-git": "^3.7.1",
     "terminal-link": "^2.1.1",
     "user-home": "^3.0.0"
-  }
+  },
+  "gitHead": "c10d89ab9e652796d05cdd096b459cada5ef8cd6"
 }

@@ -25,10 +25,11 @@
   },
   "dependencies": {
     "@lwd-cli/command": "^1.0.2",
-    "@lwd-cli/git": "file:../../models/git",
+    "@lwd-cli/git": "^1.0.2",
     "@lwd-cli/log": "^1.0.2"
   },
   "bugs": {
     "url": "https://github.com/tonssss/lwd-cli/issues"
-  }
+  },
+  "gitHead": "c10d89ab9e652796d05cdd096b459cada5ef8cd6"
 }

@@ -13,6 +13,9 @@
   "files": [
     "lib"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tonssss/lwd-cli.git"
@@ -21,11 +24,11 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@lwd-cli/command": "file:../../models/command",
-    "@lwd-cli/log": "file:../../utils/log",
-    "@lwd-cli/package": "file:../../models/package",
-    "@lwd-cli/request": "file:../../utils/request",
-    "@lwd-cli/utils": "file:../../utils/utils",
+    "@lwd-cli/command": "^1.0.2",
+    "@lwd-cli/log": "^1.0.2",
+    "@lwd-cli/package": "^1.0.2",
+    "@lwd-cli/request": "^1.0.2",
+    "@lwd-cli/utils": "^1.0.2",
     "ejs": "^3.1.6",
     "fs-extra": "^10.0.0",
     "glob": "^7.2.0",
@@ -37,5 +40,6 @@
   },
   "bugs": {
     "url": "https://github.com/tonssss/lwd-cli/issues"
-  }
+  },
+  "gitHead": "c10d89ab9e652796d05cdd096b459cada5ef8cd6"
 }
