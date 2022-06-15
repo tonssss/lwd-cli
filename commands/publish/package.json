@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@lwd-cli/command": "^1.0.3",
-    "@lwd-cli/git": "^1.0.3",
+    "@lwd-cli/git": "file:../../models/git",
     "@lwd-cli/log": "^1.0.3"
   },
   "bugs": {

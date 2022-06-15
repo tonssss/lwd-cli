@@ -10,11 +10,11 @@ const Git = require('@lwd-cli/git')
 class PublishCommand extends Command {
     init () {
         // 处理参数
-        log.verbose('publish', this._argv, this._cmd)
+        log.verbose('publish', this._argv, this._cmd.opts)
         this.options = {
-            refreshServer: this._cmd.refreshServer,
-            refreshToken: this._cmd.refreshToken,
-            refreshOwner: this._cmd.refreshOwner
+            refreshServer: this._cmd.opts.refreshServer,
+            refreshToken: this._cmd.opts.refreshToken,
+            refreshOwner: this._cmd.opts.refreshOwner
         }
     }
 

@@ -68,7 +68,7 @@ class Git {
         this.refreshOwner = refreshOwner // 是否强化刷新远程仓库类型
     }
 
-    async prepare() {
+    async prepare () {
         // 检查缓存主目录
         this.checkHomePath()
         // 检查用户远程仓库类型
@@ -87,7 +87,7 @@ class Git {
         await this.init()
     }
 
-    async init() {
+    async init () {
         if (await this.getRemote()) {
             return;
         }
@@ -95,7 +95,7 @@ class Git {
         await this.initCommit()
     }
 
-    async initCommit() {
+    async initCommit () {
         await this.checkConflicted();
         await this.checkNotCommitted();
         if (await this.checkRemoteMaster()) {
@@ -107,7 +107,7 @@ class Git {
         }
     }
 
-    async pullRemoteRepo(branchName, options) {
+    async pullRemoteRepo (branchName, options) {
         log.info(`同步远程${branchName}分支代码`);
         await this.git.pull('origin', branchName, options)
             .catch(err => {
@@ -115,17 +115,17 @@ class Git {
             });
     }
 
-    async pushRemoteRepo(branchName) {
-        // log.info(`推送代码至${branchName}分支`);
+    async pushRemoteRepo (branchName) {
+        log.info(`推送代码至${branchName}分支`);
         await this.git.push('origin', branchName);
-        // log.success('推送代码成功');
+        log.success('推送代码成功');
     }
 
-    async checkRemoteMaster() {
+    async checkRemoteMaster () {
         return (await this.git.listRemote(['--refs'])).indexOf('refs/heads/master') >= 0;
     }
 
-    async checkNotCommitted() {
+    async checkNotCommitted () {
         const status = await this.git.status();
         if (status.not_added.length > 0 ||
             status.created.length > 0 ||
@@ -152,7 +152,7 @@ class Git {
         }
     }
 
-    async checkConflicted() {
+    async checkConflicted () {
         log.info('代码冲突检查');
         const status = await this.git.status();
         if (status.conflicted.length > 0) {
@@ -161,7 +161,7 @@ class Git {
         log.success('代码冲突检查通过');
     }
 
-    getRemote() {
+    getRemote () {
         const gitPath = path.resolve(this.dir, GIT_ROOT_DIR)
         this.remote = this.gitServer.getRemote(this.login, this.name)
         if (fs.existsSync(gitPath)) {
@@ -170,7 +170,7 @@ class Git {
         }
     }
 
-    async initAndAddRemote() {
+    async initAndAddRemote () {
         log.info('执行git初始化');
         await this.git.init(this.dir);
         log.info('添加git remote');
@@ -181,7 +181,7 @@ class Git {
         }
     }
 
-    checkHomePath() {
+    checkHomePath () {
         if (!this.homePath) {
             if (process.env.CLI_HOME_PATH) {
                 this.homePath = process.env.CLI_HOME_PATH
@@ -196,7 +196,7 @@ class Git {
         }
     }
 
-    async checkGitServer() {
+    async checkGitServer () {
         const gitServerPath = this.createPath(GIT_SERVER_FILE)
         let gitServer = readFile(gitServerPath)
         if (!gitServer || this.refreshServer) {
@@ -218,9 +218,9 @@ class Git {
         }
     }
 
-    async checkGitToken() {
-        const tokenpath = this.createPath(GIT_TOKEN_FILE)
-        let token = readFile(tokenpath)
+    async checkGitToken () {
+        const tokenPath = this.createPath(GIT_TOKEN_FILE)
+        let token = readFile(tokenPath)
         if (!token || this.refreshToken) {
             log.warn(this.gitServer.type + 'token未生成', '请先生成' + this.gitServer.type + 'token，'
                 + terminalLink('链接', this.gitServer.getTokenHelpUrl()))
@@ -239,7 +239,7 @@ class Git {
         this.gitServer.setToken(token)
     }
 
-    async getUserAndOrgs() {
+    async getUserAndOrgs () {
         this.user = await this.gitServer.getUser()
         if (!this.user) {
             throw new Error('用户信息获取失败！')
@@ -253,13 +253,13 @@ class Git {
         log.success(this.gitServer.type + '用户和组织信息获取成功')
     }
 
-    async checkGitOwner() {
+    async checkGitOwner () {
         const ownerPath = this.createPath(GIT_OWN_FILE)
         const loginPath = this.createPath(GIT_LOGIN_FILE)
         let owner = readFile(ownerPath)
         let login = readFile(loginPath)
         if (!owner || !login || this.refreshOwner) {
-            owner = await (inquirer.prompt({
+            owner = (await inquirer.prompt({
                 type: 'list',
                 name: 'owner',
                 message: '请选择远程仓库类型',
@@ -291,7 +291,7 @@ class Git {
         this.login = login
     }
 
-    async checkRepo() {
+    async checkRepo () {
         let repo = await this.gitServer.getRepo(this.login, this.name)
         log.verbose('repo', repo)
         if (!repo) {
@@ -319,37 +319,37 @@ class Git {
         this.repo = repo
     }
 
-    checkGitIgnore() {
+    checkGitIgnore () {
         const gitIgnore = path.resolve(this.dir, GIT_IGNORE_FILE);
         if (!fs.existsSync(gitIgnore)) {
             writeFile(gitIgnore, `.DS_Store
-    node_modules
-    /dist
+node_modules
+/dist
     
     
-    # local env files
-    .env.local
-    .env.*.local
+# local env files
+.env.local
+.env.*.local
     
-    # Log files
-    npm-debug.log*
-    yarn-debug.log*
-    yarn-error.log*
-    pnpm-debug.log*
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
     
-    # Editor directories and files
-    .idea
-    .vscode
-    *.suo
-    *.ntvs*
-    *.njsproj
-    *.sln
-    *.sw?`);
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?`)
             log.success(`自动写入${GIT_IGNORE_FILE}文件成功`);
         }
     }
 
-    createGitServer(gitServer) {
+    createGitServer (gitServer) {
         const _gitServer = gitServer.trim()
         if (_gitServer === GITHUB) {
             return new Github()
@@ -359,7 +359,7 @@ class Git {
         return null
     }
 
-    createPath(file) {
+    createPath (file) {
         const rootDir = path.resolve(this.homePath, GIT_ROOT_DIR)
         const filePath = path.resolve(rootDir, file)
         fse.ensureDirSync(rootDir)
