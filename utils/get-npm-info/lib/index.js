@@ -10,6 +10,7 @@ function getNpmInfo (npmName, registry) {
   }
   const registryUrl = registry || getDefaultRegistry()
   const npmInfoUrl = urlJoin(registryUrl, npmName)
+  console.log(npmInfoUrl)
   return axios
     .get(npmInfoUrl)
     .then((response) => {
@@ -23,7 +24,7 @@ function getNpmInfo (npmName, registry) {
     })
 }
 
-function getDefaultRegistry (isOrignal = false) {
+function getDefaultRegistry (isOrignal = true) {
   return isOrignal
     ? 'https://registry.npmjs.org'
     : 'https://registry.npm.taobao.org'

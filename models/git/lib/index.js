@@ -222,7 +222,7 @@ class Git {
         const tokenpath = this.createPath(GIT_TOKEN_FILE)
         let token = readFile(tokenpath)
         if (!token || this.refreshToken) {
-            log.warn(this.gitServer.type + 'token未生成', '请先生存' + this.gitServer.type + 'token，'
+            log.warn(this.gitServer.type + 'token未生成', '请先生成' + this.gitServer.type + 'token，'
                 + terminalLink('链接', this.gitServer.getTokenHelpUrl()))
             token = (await inquirer.prompt({
                 type: 'password',

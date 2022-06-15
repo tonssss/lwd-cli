@@ -25,7 +25,7 @@
   "gitHead": "c10d89ab9e652796d05cdd096b459cada5ef8cd6",
   "dependencies": {
     "@lwd-cli/exec": "^1.0.3",
-    "@lwd-cli/get-npm-info": "^1.0.3",
+    "@lwd-cli/get-npm-info": "^file:../../utils/get-npm-info",
     "@lwd-cli/init": "^1.0.3",
     "@lwd-cli/log": "^1.0.3",
     "colors": "^1.4.0",
