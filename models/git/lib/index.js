@@ -11,6 +11,7 @@ const log = require('@lwd-cli/log')
 const { readFile, writeFile, spinnerStart } = require('@lwd-cli/utils');
 const Github = require('./Github');
 const Gitee = require('./Gitee');
+const semver = require('semver')
 
 const DEFAULT_CLI_HOME = '.imooc-cli-dev'
 const GIT_ROOT_DIR = '.git'
@@ -24,6 +25,10 @@ const GITHUB = 'github'
 const GITEE = 'gitee'
 const REPO_OWNER_USER = 'user'
 const REPO_OWNER_ORG = 'org'
+const VERSION_RELEASE = 'release'
+const VERSION_DEVELOP = 'dev'
+const TEMPLATE_TEMP_DIR = 'oss'
+const COMPONENT_FILE = '.componentrc'
 
 const GIT_SERVER_TYPE = [{
     name: 'Github',
@@ -66,9 +71,10 @@ class Git {
         this.refreshServer = refreshServer // 是否强制刷新远程仓库
         this.refreshToken = refreshToken // 是否强化刷新远程仓库token
         this.refreshOwner = refreshOwner // 是否强化刷新远程仓库类型
+        this.branch = null // 本地开发分支
     }
 
-    async prepare () {
+    async prepare() {
         // 检查缓存主目录
         this.checkHomePath()
         // 检查用户远程仓库类型
@@ -87,7 +93,7 @@ class Git {
         await this.init()
     }
 
-    async init () {
+    async init() {
         if (await this.getRemote()) {
             return;
         }
@@ -95,7 +101,135 @@ class Git {
         await this.initCommit()
     }
 
-    async initCommit () {
+    async commit() {
+        // 1.生成开发分支
+        await this.getCorrectVersion();
+        // 2.检查stash区
+        await this.checkStash();
+        // // 3.检查代码冲突
+        await this.checkConflicted();
+        // // 4.检查未提交代码
+        await this.checkNotCommitted();
+        // // 5.切换开发分支
+        await this.checkoutBranch(this.branch);
+        // // 6.合并远程master分支和开发分支代码
+        await this.pullRemoteMasterAndBranch();
+        // // 7.将开发分支推送到远程仓库
+        await this.pushRemoteRepo(this.branch);
+    }
+
+    async pullRemoteMasterAndBranch() {
+        log.info(`合并 [master] -> [${this.branch}]`);
+        await this.pullRemoteRepo('master');
+        log.success('合并远程 [master] 分支代码成功');
+        await this.checkConflicted();
+        log.info('检查远程开发分支');
+        const remoteBranchList = await this.getRemoteBranchList();
+        if (remoteBranchList.indexOf(this.version) >= 0) {
+            log.info(`合并 [${this.branch}] -> [${this.branch}]`);
+            await this.pullRemoteRepo(this.branch);
+            log.success(`合并远程 [${this.branch}] 分支代码成功`);
+            await this.checkConflicted();
+        } else {
+            log.success(`不存在远程分支 [${this.branch}]`);
+        }
+    }
+
+    async checkoutBranch(branch) {
+        const localBranchList = await this.git.branchLocal();
+        if (localBranchList.all.indexOf(branch) >= 0) {
+            await this.git.checkout(branch);
+        } else {
+            await this.git.checkoutLocalBranch(branch);
+        }
+    }
+
+    async checkStash() {
+        log.info('检查stash记录');
+        const stashList = await this.git.stashList();
+        if (stashList.all.length > 0) {
+            await this.git.stash(['pop']);
+            log.success('stash pop成功');
+        }
+    }
+
+    async getCorrectVersion() {
+        // 1.获取远程分布分支
+        // 版本号规范：release/x.y.z，dev/x.y.z
+        // 版本号递增规范：major/minor/patch
+        log.info('获取代码分支');
+        const remoteBranchList = await this.getRemoteBranchList(VERSION_RELEASE);
+        let releaseVersion = null;
+        if (remoteBranchList && remoteBranchList.length > 0) {
+            releaseVersion = remoteBranchList[0];
+        }
+        log.verbose('线上最新版本号', releaseVersion);
+        // 2.生成本地开发分支
+        const devVersion = this.version;
+        if (!releaseVersion) {
+            this.branch = `${VERSION_DEVELOP}/${devVersion}`;
+        } else if (semver.gt(this.version, releaseVersion)) {
+            log.info('当前版本大于线上最新版本', `${devVersion} >= ${releaseVersion}`);
+            this.branch = `${VERSION_DEVELOP}/${devVersion}`;
+        } else {
+            log.info('当前线上版本大于本地版本', `${releaseVersion} > ${devVersion}`);
+            const incType = (await inquirer.prompt({
+                type: 'list',
+                name: 'incType',
+                message: '自动升级版本，请选择升级版本类型',
+                default: 'patch',
+                choices: [{
+                    name: `小版本（${releaseVersion} -> ${semver.inc(releaseVersion, 'patch')}）`,
+                    value: 'patch',
+                }, {
+                    name: `中版本（${releaseVersion} -> ${semver.inc(releaseVersion, 'minor')}）`,
+                    value: 'minor',
+                }, {
+                    name: `大版本（${releaseVersion} -> ${semver.inc(releaseVersion, 'major')}）`,
+                    value: 'major',
+                }],
+            })).incType;
+            const incVersion = semver.inc(releaseVersion, incType);
+            this.branch = `${VERSION_DEVELOP}/${incVersion}`;
+            this.version = incVersion;
+        }
+        log.verbose('本地开发分支', this.branch);
+        // 3.将version同步到package.json
+        this.syncVersionToPackageJson();
+    }
+
+    syncVersionToPackageJson() {
+        const pkg = fse.readJsonSync(`${this.dir}/package.json`);
+        if (pkg && pkg.version !== this.version) {
+            pkg.version = this.version;
+            fse.writeJsonSync(`${this.dir}/package.json`, pkg, { spaces: 2 });
+        }
+    }
+
+    async getRemoteBranchList(type) {
+        const remoteList = await this.git.listRemote(['--refs']);
+        let reg;
+        if (type === VERSION_RELEASE) {
+            reg = /.+?refs\/tags\/release\/(\d+\.\d+\.\d+)/g;
+        } else {
+            reg = /.+?refs\/heads\/dev\/(\d+\.\d+\.\d+)/g;
+        }
+        return remoteList.split('\n').map(remote => {
+            const match = reg.exec(remote);
+            reg.lastIndex = 0;
+            if (match && semver.valid(match[1])) {
+                return match[1];
+            }
+        }).filter(_ => _).sort((a, b) => {
+            if (semver.lte(b, a)) {
+                if (a === b) return 0;
+                return -1;
+            }
+            return 1;
+        });
+    }
+
+    async initCommit() {
         await this.checkConflicted();
         await this.checkNotCommitted();
         if (await this.checkRemoteMaster()) {
@@ -107,7 +241,7 @@ class Git {
         }
     }
 
-    async pullRemoteRepo (branchName, options) {
+    async pullRemoteRepo(branchName, options) {
         log.info(`同步远程${branchName}分支代码`);
         await this.git.pull('origin', branchName, options)
             .catch(err => {
@@ -115,17 +249,17 @@ class Git {
             });
     }
 
-    async pushRemoteRepo (branchName) {
+    async pushRemoteRepo(branchName) {
         log.info(`推送代码至${branchName}分支`);
         await this.git.push('origin', branchName);
         log.success('推送代码成功');
     }
 
-    async checkRemoteMaster () {
+    async checkRemoteMaster() {
         return (await this.git.listRemote(['--refs'])).indexOf('refs/heads/master') >= 0;
     }
 
-    async checkNotCommitted () {
+    async checkNotCommitted() {
         const status = await this.git.status();
         if (status.not_added.length > 0 ||
             status.created.length > 0 ||
@@ -152,7 +286,7 @@ class Git {
         }
     }
 
-    async checkConflicted () {
+    async checkConflicted() {
         log.info('代码冲突检查');
         const status = await this.git.status();
         if (status.conflicted.length > 0) {
@@ -161,7 +295,7 @@ class Git {
         log.success('代码冲突检查通过');
     }
 
-    getRemote () {
+    getRemote() {
         const gitPath = path.resolve(this.dir, GIT_ROOT_DIR)
         this.remote = this.gitServer.getRemote(this.login, this.name)
         if (fs.existsSync(gitPath)) {
@@ -170,7 +304,7 @@ class Git {
         }
     }
 
-    async initAndAddRemote () {
+    async initAndAddRemote() {
         log.info('执行git初始化');
         await this.git.init(this.dir);
         log.info('添加git remote');
@@ -181,7 +315,7 @@ class Git {
         }
     }
 
-    checkHomePath () {
+    checkHomePath() {
         if (!this.homePath) {
             if (process.env.CLI_HOME_PATH) {
                 this.homePath = process.env.CLI_HOME_PATH
@@ -196,7 +330,7 @@ class Git {
         }
     }
 
-    async checkGitServer () {
+    async checkGitServer() {
         const gitServerPath = this.createPath(GIT_SERVER_FILE)
         let gitServer = readFile(gitServerPath)
         if (!gitServer || this.refreshServer) {
@@ -218,7 +352,7 @@ class Git {
         }
     }
 
-    async checkGitToken () {
+    async checkGitToken() {
         const tokenPath = this.createPath(GIT_TOKEN_FILE)
         let token = readFile(tokenPath)
         if (!token || this.refreshToken) {
@@ -239,7 +373,7 @@ class Git {
         this.gitServer.setToken(token)
     }
 
-    async getUserAndOrgs () {
+    async getUserAndOrgs() {
         this.user = await this.gitServer.getUser()
         if (!this.user) {
             throw new Error('用户信息获取失败！')
@@ -253,7 +387,7 @@ class Git {
         log.success(this.gitServer.type + '用户和组织信息获取成功')
     }
 
-    async checkGitOwner () {
+    async checkGitOwner() {
         const ownerPath = this.createPath(GIT_OWN_FILE)
         const loginPath = this.createPath(GIT_LOGIN_FILE)
         let owner = readFile(ownerPath)
@@ -291,7 +425,7 @@ class Git {
         this.login = login
     }
 
-    async checkRepo () {
+    async checkRepo() {
         let repo = await this.gitServer.getRepo(this.login, this.name)
         log.verbose('repo', repo)
         if (!repo) {
@@ -319,7 +453,7 @@ class Git {
         this.repo = repo
     }
 
-    checkGitIgnore () {
+    checkGitIgnore() {
         const gitIgnore = path.resolve(this.dir, GIT_IGNORE_FILE);
         if (!fs.existsSync(gitIgnore)) {
             writeFile(gitIgnore, `.DS_Store
@@ -349,7 +483,7 @@ pnpm-debug.log*
         }
     }
 
-    createGitServer (gitServer) {
+    createGitServer(gitServer) {
         const _gitServer = gitServer.trim()
         if (_gitServer === GITHUB) {
             return new Github()
@@ -359,7 +493,7 @@ pnpm-debug.log*
         return null
     }
 
-    createPath (file) {
+    createPath(file) {
         const rootDir = path.resolve(this.homePath, GIT_ROOT_DIR)
         const filePath = path.resolve(rootDir, file)
         fse.ensureDirSync(rootDir)

@@ -8,7 +8,7 @@ const log = require('@lwd-cli/log')
 const Git = require('@lwd-cli/git')
 
 class PublishCommand extends Command {
-    init () {
+    init() {
         // 处理参数
         log.verbose('publish', this._argv, this._cmd.opts)
         this.options = {
@@ -18,14 +18,16 @@ class PublishCommand extends Command {
         }
     }
 
-    async exec () {
+    async exec() {
         try {
             const startTime = new Date().getTime()
             // 1.初始化检查
             this.perpare()
             // 2.Git flow 自动化
             const git = new Git(this.projectInfo, this.options)
-            await git.prepare()
+            await git.prepare(); // 自动化提交准备和代码仓库初始化
+            await git.commit(); // 代码自动化提交
+            // await git.publish(); // 代码云构建+云发布
             // 3.云构建和云发布
             const endTime = new Date().getTime()
             log.info('本次发布耗时：', Math.floor((endTime - startTime) / 1000) + '秒')
@@ -37,7 +39,7 @@ class PublishCommand extends Command {
         }
     }
 
-    perpare () {
+    perpare() {
         // 1.确认项目是否为npm项目
         const projectPath = process.cwd()
         const pkgPath = path.resolve(projectPath, 'package.json')
@@ -56,7 +58,7 @@ class PublishCommand extends Command {
     }
 }
 
-function init (argv) {
+function init(argv) {
     return new PublishCommand(argv)
 }
 
